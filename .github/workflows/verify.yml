@@ -1,0 +1,20 @@
+name: Verify reference site and lab
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python build.py
+      - run: python -m unittest discover -s tests
+      - name: Run the downloaded lab
+        run: |
+          unzip -q dist/downloads/authority-boundaries-1.0.0.zip -d lab
+          cd lab
+          python -m pip install ./framework/python
+          python -m framedby_lab verify examples/authority-boundaries

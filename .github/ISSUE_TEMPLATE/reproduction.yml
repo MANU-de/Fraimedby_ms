@@ -1,0 +1,22 @@
+name: Report a reproduction
+description: Share the result of running a Framedby lab.
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Lab name and version
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform and Python or Docker version
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Command and results
+      description: Include expected and observed results. Remove secrets from logs.
+    validations:
+      required: true

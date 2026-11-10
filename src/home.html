@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Framedby | AI Security Engineering Research & Local Labs</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#ff6b00',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            900: '#431407',
+                        },
+                        darkBg: '#09090b',
+                        darkCard: '#121215',
+                        darkBorder: '#27272a'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Fira Code', 'JetBrains Mono', 'monospace']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { opacity: 0.4, filter: 'drop-shadow(0 0 15px rgba(255,107,0,0.3))' },
+                            '100%': { opacity: 0.9, filter: 'drop-shadow(0 0 35px rgba(255,107,0,0.7))' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome & Lucide Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #050507;
+            color: #f4f4f5;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Glowing Gradients & Glassmorphism */
+        .glow-orange {
+            box-shadow: 0 0 40px -10px rgba(255, 107, 0, 0.35);
+        }
+        .glow-orange-lg {
+            box-shadow: 0 0 80px -15px rgba(255, 107, 0, 0.45);
+        }
+        .glass-panel {
+            background: rgba(18, 18, 22, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel-orange {
+            background: rgba(26, 16, 12, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 107, 0, 0.25);
+        }
+        .orange-gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #ffaa66 40%, #ff6b00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .orange-badge-gradient {
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.2), rgba(255, 69, 0, 0.05));
+            border: 1px solid rgba(255, 107, 0, 0.4);
+        }
+        
+        /* Terminal styling */
+        .terminal-header {
+            background: #18181b;
+            border-bottom: 1px solid #27272a;
+        }
+        
+        /* Hide scrollbars for slick UX */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<link rel="stylesheet" href="assets/site.css"><script defer src="assets/site.js"></script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- CANVAS BACKGROUND (Interactive Security Mesh Visualizer) -->
+    <canvas id="meshCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-40"></canvas>
+
+    <!-- FLOATING BG GRADIENT ORBS -->
+    <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-brand-500/20 rounded-full blur-[140px] pointer-events-none z-0 animate-pulse-slow"></div>
+    <div class="fixed bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-red-600/10 rounded-full blur-[160px] pointer-events-none z-0"></div>
+
+    <!-- MAIN WRAPPER -->
+    <div class="relative z-10 flex-grow flex flex-col">
+        
+        <!-- HEADER / NAVIGATION -->
+        <header class="sticky top-0 z-50 glass-panel border-b border-white/10 transition-all duration-300" id="mainHeader">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <!-- Brand Logo -->
+                    <a href="#" class="flex items-center gap-3 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-orange-700 flex items-center justify-center text-white shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform duration-300">
+                            <i class="fa-solid fa-[#000] fa-shield-halved text-xl text-black"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+                                Framedby <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-500 font-mono font-medium border border-brand-500/30">Reference</span>
+                            </span>
+                            <span class="text-[10px] text-zinc-400 font-mono tracking-widest uppercase">AI Security Labs</span>
+                        </div>
+                    </a>
+
+                    <!-- Desktop Nav Links -->
+                    <nav class="hidden md:flex items-center gap-8">
+                        <a href="#publications" class="text-sm font-medium text-zinc-300 hover:text-brand-500 transition-colors">Publications</a>
+                        <a href="#labs" class="text-sm font-medium text-zinc-300 hover:text-brand-500 transition-colors">Labs & Sandbox</a>
+                        <a href="#features" class="text-sm font-medium text-zinc-300 hover:text-brand-500 transition-colors">Architecture</a>
+                        <a href="#about" class="text-sm font-medium text-zinc-300 hover:text-brand-500 transition-colors">About</a>
+                    </nav>
+
+                    <!-- Right CTAs -->
+                    <div class="hidden sm:flex items-center gap-4">
+                        <a href="{{repository_link}}"  rel="noopener" class="text-zinc-400 hover:text-white transition-colors p-2 text-lg" title="Project and contributions">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        <a href="#labs" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-brand-500 to-orange-600 hover:from-brand-600 hover:to-orange-700 text-white shadow-lg shadow-brand-500/25 transition-all duration-300 hover:shadow-brand-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+                            <i class="fa-solid fa-flask text-xs"></i>
+                            <span>Browse labs</span>
+                        </a>
+                    </div>
+
+                    <!-- Mobile Menu Toggle Button -->
+                    <button type="button" aria-label="Navigation" aria-controls="mobileMenu" aria-expanded="false" id="mobileMenuBtn" class="md:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/60 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden md:hidden glass-panel border-t border-zinc-800 px-4 pt-3 pb-6 space-y-3">
+                <a href="#publications" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-zinc-300 hover:text-brand-500 hover:bg-zinc-800/40">Publications</a>
+                <a href="#labs" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-zinc-300 hover:text-brand-500 hover:bg-zinc-800/40">Labs & Sandbox</a>
+                <a href="#features" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-zinc-300 hover:text-brand-500 hover:bg-zinc-800/40">Architecture</a>
+                <a href="#about" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-zinc-300 hover:text-brand-500 hover:bg-zinc-800/40">About</a>
+                <div class="pt-2 border-t border-zinc-800 flex flex-col gap-2">
+                    <a href="#labs" class="w-full text-center px-4 py-3 rounded-xl text-sm font-semibold bg-brand-500 text-white shadow-md">Browse labs</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- HERO SECTION -->
+        <section class="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                    
+                    <!-- Left Hero Content -->
+                    <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+                        
+                        <!-- Top Tag Badge -->
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full orange-badge-gradient text-xs font-mono text-brand-500 tracking-wide">
+                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
+                            <span>OPEN-SOURCE AI SECURITY FRAMEWORK</span>
+                        </div>
+
+                        <!-- Main Title -->
+                        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1]">
+                            Read the research.<br/>
+                            <span class="orange-gradient-text">Run the experiment.</span>
+                        </h1>
+
+                        <!-- Subtitle -->
+                        <p class="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                            Framedby publishes free AI security engineering research paired with reproducible local experiments. Audit model weights, benchmark prompt injection defenses, and stress-test LLM deployments locally.
+                        </p>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                            <a href="#publications" class="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-brand-500 via-orange-600 to-amber-600 hover:brightness-110 shadow-xl shadow-brand-500/25 transition-all duration-300 flex items-center justify-center gap-3 group">
+                                <i class="fa-solid fa-book-open text-lg"></i>
+                                <span>Browse Publications</span>
+                                <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                            
+                            <a href="#labs" class="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-zinc-200 glass-panel hover:bg-zinc-800/80 hover:text-white border border-zinc-700 transition-all duration-300 flex items-center justify-center gap-3">
+                                <i class="fa-solid fa-terminal text-brand-500"></i>
+                                <span>Launch Local Labs</span>
+                            </a>
+                        </div>
+
+                        <!-- Stats Bar -->
+                        <div class="pt-8 border-t border-zinc-800/80 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0 text-left">
+                            <div>
+                                <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">100%</div>
+                                <div class="text-xs text-zinc-500 font-medium mt-1">Reproducible</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">45+</div>
+                                <div class="text-xs text-zinc-500 font-medium mt-1">Red Team Labs</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">0KB</div>
+                                <div class="text-xs text-zinc-500 font-medium mt-1">Telemetry Leak</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Hero Visual: Interactive CLI Terminal -->
+                    <div class="lg:col-span-5 glass-panel rounded-2xl border border-zinc-800 p-6 font-mono">
+<p class="text-brand-500 text-sm">LOCAL LAB / VERIFIED PYTHON RUN</p>
+<h2 class="text-xl text-white font-bold mt-3">{{featured_title}}</h2>
+<p class="text-zinc-400 mt-3">Example command after installing the bundled framework</p>
+<pre class="overflow-auto mt-3 p-3 bg-zinc-900 rounded"><code id="cmdText">{{featured_command}}</code></pre>
+<div class="flex flex-wrap gap-4 mt-4">
+<button type="button" data-copy="cmdText" class="px-3 py-2 rounded bg-zinc-800">Copy command</button>
+<a href="{{featured_url}}" class="px-3 py-2 rounded bg-brand-500 text-black font-bold">Run locally</a>
+</div></div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CORE FEATURES SECTION -->
+        <section id="features" class="py-20 relative bg-zinc-950/60 border-y border-zinc-800/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                    <div class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-brand-500/10 text-brand-500 border border-brand-500/20 uppercase tracking-widest">
+                        Engineering Pillars
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white">
+                        Designed for Security Researchers & AI Architects
+                    </h2>
+                    <p class="text-zinc-400 text-base sm:text-lg">
+                        Traditional application security tools fall short when auditing stochastic neural networks. Framedby bridges the gap between theoretical research and local execution.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Feature Card 1 -->
+                    <div class="glass-panel p-8 rounded-2xl border border-zinc-800 hover:border-brand-500/50 transition-all duration-300 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500 text-2xl mb-6 group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-black transition-all">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-500 transition-colors">Reproducible Local Experiments</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                            Run the first lab with synthetic inputs in local Python. Its bundle also includes an optional Docker Compose configuration.
+                        </p>
+                        <ul class="space-y-2 text-xs text-zinc-400 font-mono">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> Versioned lab bundles and checksums</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> Offline local HuggingFace cache</li>
+                        </ul>
+                    </div>
+
+                    <!-- Feature Card 2 -->
+                    <div class="glass-panel p-8 rounded-2xl border border-zinc-800 hover:border-brand-500/50 transition-all duration-300 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500 text-2xl mb-6 group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-black transition-all">
+                            <i class="fa-solid fa-bug-slash"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-500 transition-colors">Threat & Vulnerability Intel</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                            Continuous updates on prompt injection vectors, jailbreak taxonomies, model weights backdoors, and data extraction vulnerabilities.
+                        </p>
+                        <ul class="space-y-2 text-xs text-zinc-400 font-mono">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> OWASP Top 10 for LLMs coverage</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> Automated payload generation</li>
+                        </ul>
+                    </div>
+
+                    <!-- Feature Card 3 -->
+                    <div class="glass-panel p-8 rounded-2xl border border-zinc-800 hover:border-brand-500/50 transition-all duration-300 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500 text-2xl mb-6 group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-black transition-all">
+                            <i class="fa-solid fa-file-contract"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-brand-500 transition-colors">Open Technical Papers</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                            Peer-reviewed research whitepapers detailing deep mathematical and structural analysis of neural network security boundaries.
+                        </p>
+                        <ul class="space-y-2 text-xs text-zinc-400 font-mono">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> Free & open access PDFs</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-500"></i> Complete code & dataset proofs</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE RESEARCH & LABS EXPLORER -->
+        <section id="publications" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header with Filter Controls -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div>
+                        <div class="text-brand-500 text-xs font-mono uppercase tracking-widest mb-2">Interactive Catalog</div>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-white">Publications & Hands-on Labs</h2>
+                    </div>
+
+<div>
+<label for="searchInput" class="block text-sm mb-2">Search the catalog</label>
+<input id="searchInput" type="search" class="rounded bg-zinc-900 border border-zinc-700 p-2">
+<div class="flex flex-wrap gap-2 mt-3">{{filters}}</div>
+</div></div>
+<p id="catalog-results" aria-live="polite" class="mb-4 text-zinc-400"></p>
+<div id="labs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{{cards}}</div>
+</div></section>
+
+        <!-- ABOUT & COMMUNITY CALLOUT -->
+        <section id="about" class="py-20 relative border-t border-zinc-800/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="glass-panel-orange rounded-3xl p-8 sm:p-12 relative overflow-hidden glow-orange-lg">
+                    <!-- Background Glow Overlay -->
+                    <div class="absolute right-0 top-0 translate-x-1/3 -translate-y-1/3 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                        <div class="lg:col-span-8 space-y-4">
+                            <span class="text-xs font-mono text-brand-500 uppercase tracking-widest font-semibold">Part of NeuralStack | MS - AI Security Engineering Ecosystem</span>
+                            <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Empowering AI Engineers with Transparent Defenses</h2>
+                            <p class="text-zinc-300 text-base leading-relaxed">
+                                Framedby is an open project hosted by NeuralStack | MS AI Security Engineering Ecosystem. We believe AI systems cannot be secured behind proprietary black boxes. By providing open-source, reproducible local setups, engineers can audit and fortify models with total sovereignty.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-4">
+                            <a href="{{repository_link}}"  class="w-full px-6 py-4 rounded-xl font-bold bg-white text-black hover:bg-zinc-200 transition-colors text-center flex items-center justify-center gap-2 shadow-lg">
+                                <i class="fa-brands fa-github text-xl"></i>
+                                <span>Contribute on GitHub</span>
+                            </a>
+                            <a href="#publications" class="w-full px-6 py-4 rounded-xl font-bold bg-zinc-900 border border-zinc-700 text-white hover:border-brand-500 transition-colors text-center flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-book text-brand-500"></i>
+                                <span>Read Documentation</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-zinc-950 border-t border-zinc-800/80 py-12 relative z-10 text-xs text-zinc-400">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <!-- Footer Brand -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-black font-bold">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <div class="text-white font-bold text-sm">Framedby</div>
+                            <div class="text-zinc-500 font-mono text-[11px]">NeuralStack | MS - AI Security Engineering Ecosystem</div>
+                        </div>
+                    </div>
+
+                    <!-- Links -->
+                    <div class="flex flex-wrap items-center justify-center gap-6 text-zinc-400 font-medium">
+                        <a href="support/" class="hover:text-brand-500">Support Framedby</a>
+                        <a href="#publications" class="hover:text-brand-500 transition-colors">Publications</a>
+                        <a href="#labs" class="hover:text-brand-500 transition-colors">Labs</a>
+                        <a href="#features" class="hover:text-brand-500 transition-colors">Architecture</a>
+                        <a href="#about" class="hover:text-brand-500 transition-colors">NeuralStack | MS - AI Security Engineering Ecosystem</a>
+                        <a href="{{repository_link}}"  class="hover:text-brand-500 transition-colors">Project &amp; contributions</a>
+                    </div>
+                </div>
+
+                <div class="border-t border-zinc-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500 text-[11px]">
+                    <p>© 2026 Framedby AI Security Labs. Published under Apache 2.0 License. Free & Open Access.</p>
+                    <p class="font-mono">Built for reproducible local research.</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

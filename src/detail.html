@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{title}} | Framedby</title><link rel="stylesheet" href="../../assets/site.css">
+<script defer src="../../assets/site.js"></script></head>
+<body class="reader"><main>
+<a href="../../#publications">Back to catalog</a>
+<p class="eyebrow">{{status}} · v{{version}} · about {{minutes}} minutes</p>
+<h1>{{title}}</h1><p>{{summary}}</p>
+<h2>Predict the outcome</h2>
+<p>Make a prediction before opening each result. The agent proposes a tool call and the policy checks the role supplied by the trusted caller.</p>
+{{cases}}
+<h2>Run locally</h2>
+<p>{{prerequisites}}</p>
+<p><a href="../../downloads/{{bundle}}" download>Download lab v{{version}}</a> · <a href="../../downloads/{{bundle}}.sha256">SHA-256 checksum</a></p>
+<p>Extract the ZIP, open a terminal in its root, and activate a Python virtual environment. Install the bundled framework:</p>
+<pre><code>python -m pip install ./framework/python</code></pre>
+<pre><code id="lab-command">{{command}}</code></pre>
+<button type="button" data-copy="lab-command">Copy command</button>
+<p>For Docker, see the README in the bundle. The Python run uses synthetic fixtures and works offline after dependencies are installed.</p>
+<h2>Reproducibility</h2>
+<dl><dt>Lab version</dt><dd>{{version}}</dd><dt>Last verified</dt><dd>{{verifiedOn}}</dd>
+<dt>Tested on</dt><dd>{{testedOn}}</dd><dt>CI evidence</dt><dd>{{verification}}</dd></dl>
+<p>Expect three passing scenarios, zero effects for the denied write, and one effect across both deliveries of the authorized write.</p>
+<pre><code>{{evidence}}</code></pre>
+<p><a href="../../downloads/{{slug}}-evidence.json">Full local evidence report</a></p>
+<p>The lab models sequential requests in one process. Production idempotency requires durable state and concurrency controls.</p>
+<p><a href="{{issue}}">Report a reproduction</a> · <a href="../../support/">Support Framedby</a></p>
+</main></body></html>

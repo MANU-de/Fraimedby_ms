@@ -1,0 +1,94 @@
+[
+  {
+    "schema_version": "0.1",
+    "lab_id": "flf-001",
+    "lab_version": "1.0.0",
+    "scenario_id": "authorized-read",
+    "run_id": "7deab213-62d0-4c4c-9b61-c7e55a63137d",
+    "started_at": "2026-11-09T08:54:58.693224+00:00",
+    "duration_ms": 0,
+    "status": "passed",
+    "observations": {
+      "requested_action": "read",
+      "authorization_decision": "allow",
+      "execution_attempted": true,
+      "external_effect_count": 0
+    },
+    "verification": {
+      "assertions_passed": 3,
+      "assertions_failed": 0,
+      "assertions": {
+        "fixture returned": true,
+        "executed once": true,
+        "no writes": true
+      }
+    },
+    "environment": {
+      "runtime": "local-python",
+      "python": "3.13.15",
+      "framework": "0.1.0"
+    }
+  },
+  {
+    "schema_version": "0.1",
+    "lab_id": "flf-001",
+    "lab_version": "1.0.0",
+    "scenario_id": "unauthorized-write",
+    "run_id": "aa9d9e52-ba4f-4e6f-8f4a-f6853e04e15c",
+    "started_at": "2026-11-09T08:54:58.694959+00:00",
+    "duration_ms": 0,
+    "status": "passed",
+    "observations": {
+      "requested_action": "write",
+      "authorization_decision": "denied",
+      "execution_attempted": false,
+      "external_effect_count": 0
+    },
+    "verification": {
+      "assertions_passed": 4,
+      "assertions_failed": 0,
+      "assertions": {
+        "denied": true,
+        "executor untouched": true,
+        "no writes": true,
+        "fixture unchanged": true
+      }
+    },
+    "environment": {
+      "runtime": "local-python",
+      "python": "3.13.15",
+      "framework": "0.1.0"
+    }
+  },
+  {
+    "schema_version": "0.1",
+    "lab_id": "flf-001",
+    "lab_version": "1.0.0",
+    "scenario_id": "duplicate-execution",
+    "run_id": "e5ba8e84-69c2-4162-8334-bad2ffcd1601",
+    "started_at": "2026-11-09T08:54:58.696224+00:00",
+    "duration_ms": 0,
+    "status": "passed",
+    "observations": {
+      "requested_action": "write",
+      "first_result": "written",
+      "second_result": "replay",
+      "external_effect_count": 1
+    },
+    "verification": {
+      "assertions_passed": 4,
+      "assertions_failed": 0,
+      "assertions": {
+        "first written": true,
+        "replay recognized": true,
+        "one write": true,
+        "fixture updated": true
+      }
+    },
+    "environment": {
+      "runtime": "local-python",
+      "python": "3.13.15",
+      "framework": "0.1.0"
+    }
+  }
+]

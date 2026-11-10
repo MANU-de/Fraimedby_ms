@@ -1,0 +1,88 @@
+[
+  {
+    "slug": "authority-boundaries",
+    "title": "Agent Authority Boundary Lab",
+    "status": "Verified",
+    "topics": [
+      "Authorization",
+      "Red Teaming"
+    ],
+    "summary": "Trace an allowed read, a denied write, and an authorized replay through a deterministic tool boundary.",
+    "version": "1.0.0",
+    "minutes": 15,
+    "verifiedOn": "2026-11-09",
+    "testedOn": "Windows x64 / Python 3.13.15",
+    "prerequisites": "Python 3.12+ and a terminal. Docker Compose is optional.",
+    "bundle": "authority-boundaries-1.0.0.zip",
+    "command": "python -m framedby_lab verify examples/authority-boundaries",
+    "verificationRun": "",
+    "cases": [
+      [
+        "A reader requests a read. Does the executor run?",
+        "Allow. The executor returns the fixture. Zero writes."
+      ],
+      [
+        "A reader requests a write. Does the executor run?",
+        "Deny. The executor is never called. Zero writes."
+      ],
+      [
+        "A writer delivers the same authorized write twice. How many writes occur?",
+        "One. The first delivery writes and the second is recognized as a replay."
+      ]
+    ]
+  },
+  {
+    "slug": "indirect-injection",
+    "title": "Bypassing Guardrails via Indirect Multi-Turn Injection",
+    "topics": [
+      "Prompt Injection"
+    ],
+    "status": "Planned",
+    "summary": "Research concept in the roadmap."
+  },
+  {
+    "slug": "safetensors-backdoors",
+    "title": "Steganographic Backdoors in SafeTensors Weights",
+    "topics": [
+      "Weights Auditing"
+    ],
+    "status": "Planned",
+    "summary": "Research concept in the roadmap."
+  },
+  {
+    "slug": "adversarial-tokens",
+    "title": "Automated Adversarial Token Optimization (AATO)",
+    "topics": [
+      "Red Teaming"
+    ],
+    "status": "Planned",
+    "summary": "Research concept in the roadmap."
+  },
+  {
+    "slug": "prompt-extraction",
+    "title": "System Prompt Extraction via Model Calibration Exploits",
+    "topics": [
+      "Prompt Injection"
+    ],
+    "status": "Planned",
+    "summary": "Research concept in the roadmap."
+  },
+  {
+    "slug": "zero-trust-proxy",
+    "title": "Zero-Trust Proxy Gateway for Inference Endpoints",
+    "topics": [
+      "Red Teaming"
+    ],
+    "status": "Planned",
+    "summary": "Research concept in the roadmap."
+  },
+  {
+    "slug": "poisoning-mitigation",
+    "title": "Training Time Poisoning Mitigation Framework",
+    "topics": [
+      "Weights Auditing"
+    ],
+    "status": "Planned",
+    "summary": "Research concept in the roadmap."
+  }
+]
