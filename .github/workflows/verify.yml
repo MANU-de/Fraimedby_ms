@@ -17,4 +17,4 @@ jobs:
           unzip -q dist/downloads/authority-boundaries-1.0.0.zip -d lab
           cd lab
           python -m pip install ./framework/python
-          python -m framedby_lab verify examples/authority-boundaries
+          python -m frameby_lab verify examples/authority-boundaries
