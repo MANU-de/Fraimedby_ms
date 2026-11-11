@@ -45,18 +45,17 @@ def https(value):
     return text(value)
 
 
-def card(lab, publication=False):
+
+def card(lab):
     status = text(lab["status"])
     topics = text("|".join(lab["topics"]))
     labels = text(" · ".join(lab["topics"]))
-    link = f'<a class="text-brand-500 font-bold" href="labs/{text(lab["slug"])}/">Run locally →</a>' if lab.get("bundle") else ""
-    if publication and link:
-        link = (
-            '<div class="flex flex-col items-start gap-2">'
-            f"{link}"
-            '<a class="text-brand-500 font-bold" href="#">Publication</a>'
-            "</div>"
-        )
+    link = (
+        f'<a class="text-brand-500 font-bold" '
+        f'href="labs/{text(lab["slug"])}/">'
+        'Run locally →</a>'
+        if lab.get("bundle") else ""
+    )
     version = f' · v{text(lab["version"])}' if lab.get("version") else ""
     return f"""<article data-topics="{topics}" class="glass-panel rounded-2xl p-6 border border-zinc-800">
 <p class="text-brand-500 font-mono text-xs">{status}{version}</p>
@@ -90,7 +89,7 @@ def build():
     write("", render((SOURCE / "home.html").read_text(encoding="utf-8"), {
         "featured_title": text(featured["title"]), "featured_command": text(featured["command"]),
         "featured_url": f'labs/{text(featured["slug"])}/', "repository_link": text(repository_link),
-        "filters": filters, "cards": "".join(card(lab, index == 0) for index, lab in enumerate(labs)),
+        "filters": filters, "cards": "".join(card(lab) for lab in labs),
     }))
     for lab in labs:
         if not lab.get("bundle"):
