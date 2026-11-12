@@ -26,26 +26,45 @@ class Links(HTMLParser):
             if attribute in attrs:
                 self.links.append(attrs[attribute])
 
-
+  
 class SiteTests(unittest.TestCase):
+
     @classmethod
     def setUpClass(cls):
         build()
 
     def test_internal_links(self):
-        pages = {page: Links(page.read_text(encoding="utf-8")) for page in DIST.rglob("*.html")}
+        pages = {
+            page: Links(page.read_text(encoding="utf-8"))
+            for page in DIST.rglob("*.html")
+        }
+
         for page, parsed in pages.items():
             for link in parsed.links:
                 parts = urlsplit(link)
+
                 if parts.scheme or parts.netloc:
                     continue
-                target = (page.parent / parts.path).resolve() if parts.path else page
+
+                if parts.path.startswith("/"):
+                    target = (DIST / parts.path.lstrip("/")).resolve()
+                elif parts.path:
+                    target = (page.parent / parts.path).resolve()
+                else:
+                    target = page
+
                 if target.is_dir():
                     target = target / "index.html"
+
                 with self.subTest(page=page.name, link=link):
                     self.assertTrue(target.is_file(), target)
+
                     if parts.fragment:
-                        self.assertIn(parts.fragment, pages[target].ids)
+                        self.assertIn(
+                            parts.fragment,
+                            pages[target].ids
+                        )
+
 
     def test_ready_and_planned_content(self):
         home = (DIST / "index.html").read_text(encoding="utf-8")
