@@ -1,0 +1,104 @@
+--- a/src/home.html
++++ b/src/home.html
+@@ -388,4 +388,4 @@
+-                            <a href="#publications" class="w-full px-6 py-4 rounded-xl font-bold bg-zinc-900 border border-zinc-700 text-white hover:border-brand-500 transition-colors text-center flex items-center justify-center gap-2">
++                            <a href="guide/" class="w-full px-6 py-4 rounded-xl font-bold bg-zinc-900 border border-zinc-700 text-white hover:border-brand-500 transition-colors text-center flex items-center justify-center gap-2">
+                                 <i class="fa-solid fa-book text-brand-500"></i>
+                                 <span>Read Documentation</span>
+                             </a>
+--- a/build.py
++++ b/build.py
+@@ -120,1 +120,2 @@
++    write("guide", (SOURCE / "guide.html").read_text(encoding="utf-8"))
+     write("support", page("Support Framedby", support + "<p>Reading, downloading, and running the lab are free.</p>"))
+diff --git a/src/guide.html b/src/guide.html
+new file mode 100644
+--- /dev/null
++++ b/src/guide.html
+@@ -0,0 +1,86 @@
++<!doctype html>
++<html lang="en">
++<head>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width,initial-scale=1">
++  <title>Platform Guide | Framedby</title>
++  <meta name="description" content="Learn how to explore Framedby publications, run verified AI security labs locally, interpret evidence, and contribute feedback.">
++  <link rel="canonical" href="https://framedby.ms/guide/">
++  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
++  <link rel="stylesheet" href="../assets/site.css">
++</head>
++<body class="reader">
++<main>
++  <p class="eyebrow"><a href="../">Framedby</a> / Platform guide</p>
++  <h1>Explore, run, and verify.</h1>
++  <p><strong>Framedby</strong> is an evolving technical publication and hands-on lab platform focused on AI security engineering. It connects research questions with small, inspectable experiments that readers can run and evaluate themselves.</p>
++  <p>The platform is in <strong>public preview</strong>. The first lab is available, while additional labs and publications are planned. Feedback on content, usability, reproducibility, and implementation is welcome.</p>
++
++  <nav aria-label="On this page">
++    <h2>In this guide</h2>
++    <ul>
++      <li><a href="#explore">Explore the catalog</a></li>
++      <li><a href="#status">Understand content status</a></li>
++      <li><a href="#run">Run a local lab</a></li>
++      <li><a href="#evidence">Interpret results and evidence</a></li>
++      <li><a href="#contribute">Give feedback or report a problem</a></li>
++    </ul>
++  </nav>
++
++  <section id="explore">
++    <h2>1. Explore the catalog</h2>
++    <p>Visit the <a href="../#publications">publications and hands-on labs catalog</a>. Each card identifies a research topic, its current status, and a short description. Browse by topic to discover subjects such as authorization, prompt injection, and weights auditing.</p>
++    <p>Open an available lab to read its scenario, make a prediction, inspect expected behavior, and download the reproducible package. Planned cards describe intended research rather than runnable releases.</p>
++  </section>
++
++  <section id="status">
++    <h2>2. Understand content status</h2>
++    <dl>
++      <dt>Planned</dt><dd>A proposed research topic; no verified runnable lab is promised.</dd>
++      <dt>Experimental</dt><dd>Work in progress; behavior or interfaces may change.</dd>
++      <dt>Verified</dt><dd>A published lab with recorded local verification evidence for the stated scenarios and environment. Verification is limited to its documented scope.</dd>
++    </dl>
++    <p>Status labels do not indicate a formal security certification or proof that a design is safe for production.</p>
++  </section>
++
++  <section id="run">
++    <h2>3. Run the first lab locally</h2>
++    <p>Start with the <a href="../labs/authority-boundaries/">Agent Authority Boundary Lab (v1.0.0)</a>. It traces an allowed read, a denied write, and a duplicate authorized write through a deterministic tool boundary.</p>
++    <ol>
++      <li>Use a terminal with Python 3.12 or later, preferably inside a fresh virtual environment.</li>
++      <li><a href="../downloads/authority-boundaries-1.0.0.zip">Download the ZIP archive</a> and extract it.</li>
++      <li>Open the terminal at the <strong>root of the extracted lab</strong>, where the <code>framework/</code> and <code>examples/</code> directories are located.</li>
++      <li>Install the bundled framework, then execute the verification command:</li>
++    </ol>
++    <pre><code>python -m pip install ./framework/python
++python -m framedby_lab verify examples/authority-boundaries</code></pre>
++    <p>The lab uses synthetic fixtures. After dependencies are installed, its Python verification can run offline. Optional Docker instructions are included in the lab bundle.</p>
++  </section>
++
++  <section id="evidence">
++    <h2>4. Interpret results and evidence</h2>
++    <p>Read each scenario before checking the expected result. The verified release documents:</p>
++    <ul>
++      <li><strong>Authorized read:</strong> allowed, fixture returned, zero writes.</li>
++      <li><strong>Unauthorized write:</strong> denied before the executor is called, zero writes.</li>
++      <li><strong>Duplicate authorized write:</strong> first delivery writes, second is treated as a replay, one write total.</li>
++    </ul>
++    <p>The lab page links to its <a href="../downloads/authority-boundaries-evidence.json">recorded verification evidence</a> and a <a href="../downloads/authority-boundaries-1.0.0.zip.sha256">SHA-256 digest</a> for checking the downloadable archive's integrity.</p>
++    <p><strong>Important limitation:</strong> this is a sequential single-process demonstration. Real production idempotency requires durable state and concurrency controls. A passing lab does not establish exactly-once external effects in distributed deployments.</p>
++  </section>
++
++  <section id="contribute">
++    <h2>5. Share feedback and contribute</h2>
++    <p>Framedby is being developed in the open. Suggestions about its structure, research direction, navigation, or usefulness are encouraged:</p>
++    <ul>
++      <li><a href="https://github.com/MANU-de/Fraimedby_ms/discussions">Share ideas and general feedback on GitHub Discussions</a>.</li>
++      <li><a href="https://github.com/MANU-de/Fraimedby_ms/issues/new">Report a reproducible bug through GitHub Issues</a>.</li>
++      <li><a href="https://github.com/MANU-de/Fraimedby_ms">Browse the source repository</a> to review the publishing workflow or propose a change.</li>
++    </ul>
++    <p>For reproducibility reports, include the lab name and version, platform, Python version, command, expected result, and observed result. Remove personal information, credentials, and sensitive logs before sharing.</p>
++  </section>
++  <hr>
++  <p><a href="../">Back to Framedby homepage</a> · <a href="../#publications">Explore publications &amp; labs</a></p>
++</main>
++</body>
++</html>
