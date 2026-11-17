@@ -117,6 +117,7 @@ def build():
         }))
     donation = site["donationUrl"]
     support = f'<p><a href="{https(donation)}">Make an optional donation</a></p>' if donation else "<p>Optional donations are planned. A donation link will appear here when one is available.</p>"
+    write("guide", (SOURCE / "guide.html").read_text(encoding="utf-8"))
     write("support", page("Support Framedby", support + "<p>Reading, downloading, and running the lab are free.</p>"))
     issue_link = f'<p><a href="{repository_link}/issues/new">Open a GitHub issue</a></p>' if repo else "<p>The repository destination has yet to be configured.</p>"
     write("contribute", page("Report a reproduction", "<p>Include the lab name and version, platform, command, expected result, and observed result. Remove secrets before sharing logs.</p>" + issue_link))
