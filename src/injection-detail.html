@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{title}} | Framedby Lab</title>
+<meta name="description" content="{{summary}}">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/site.css">
+<script defer src="../../assets/site.js"></script>
+</head>
+<body class="reader injection-page">
+<main>
+<nav aria-label="Breadcrumb"><a href="../../#publications">&larr; Back to publications &amp; labs</a></nav>
+<div class="injection-hero">
+<p class="eyebrow">LAB #02 <span class="injection-status">{{status}} · v{{version}}</span></p>
+<h1>{{title}}</h1>
+<p class="injection-lead">{{summary}}</p>
+<div class="lab-tags"><span>Prompt Injection</span><span>Red Teaming</span><span>Offline Simulation</span></div>
+<p class="injection-meta">Approx. {{minutes}} minutes · Python 3.11+ · Dockerfile included</p>
+</div>
+<section aria-labelledby="objective">
+<h2 id="objective">Research question</h2>
+<p>What happens if a RAG-based assistant interprets instructions embedded in lower-trust Markdown as if they were trusted instructions, after successive retrieval turns?</p>
+<p>This lab models that authority-crossing mistake with <strong>three synthetic retrieved documents</strong>, including a nested Markdown block containing a benign, fixed instruction marker. It compares an intentionally vulnerable toy interpreter with a guarded interpreter that treats retrieved data as data.</p>
+<p><strong>Research scope:</strong> This is a deterministic simulation; it does not demonstrate a bypass of a real model or production guardrail, and it does not reproduce actual context-window attention or truncation behavior.</p>
+</section>
+<section aria-labelledby="experiment">
+<h2 id="experiment">Predict the outcomes</h2>
+<p>Consider the sequence before expanding each expected result.</p>
+<details><summary>Turn 1–2: Benign retrieval — is an instruction promoted?</summary><p>No. The context contains only policy text and a Markdown table, so the vulnerable toy interpreter returns the normal policy answer.</p></details>
+<details><summary>Turn 3: Nested Markdown — what does the intentionally vulnerable interpreter do?</summary><p>It promotes a synthetic marker inside the retrieved document into an instruction and emits the fixed canary <code>SIMULATED_POLICY_OVERRIDE</code>. No external action is executed.</p></details>
+<details><summary>Turn 3: How does the guarded interpreter respond?</summary><p>It treats the marker as untrusted source text and answers the benign policy question: access log retention is 30 days.</p></details>
+</section>
+<section aria-labelledby="run">
+<h2 id="run">Run the experiment locally</h2>
+<p>{{prerequisites}}</p>
+<p><a href="../../downloads/{{bundle}}" download>Download lab archive (v{{version}})</a> · <a href="../../downloads/{{bundle}}.sha256">Verify SHA-256</a></p>
+<p>Extract the ZIP and open a terminal inside the extracted directory. No pip installation or API keys are required.</p>
+<pre><code id="lab-command">{{command}}</code></pre>
+<button type="button" data-copy="lab-command">Copy command</button>
+<h3>Optional Docker execution</h3>
+<pre><code>docker build -t framedby-indirect-injection:0.1.0 .
+docker run --rm --network none --read-only framedby-indirect-injection:0.1.0</code></pre>
+<p>The Dockerfile is included, but the container build has not been independently verified as part of this release. The simulation requires no network access.</p>
+</section>
+<section aria-labelledby="evidence">
+<h2 id="evidence">Verification evidence and limitations</h2>
+<p>The release contains unit tests, eight deterministic acceptance assertions, and a structured evidence report. Expected: all assertions pass, the vulnerable interpreter emits a synthetic canary, the guarded interpreter does not, and no external effects occur.</p>
+<pre><code>{{evidence}}</code></pre>
+<p><a href="../../downloads/{{slug}}-evidence.json">Full JSON evidence report</a></p>
+<p>Model-based evaluation, actual RAG retrieval, markdown parser exploits, and measured context-window poisoning remain future research extensions, not claims of this demonstration.</p>
+<p>Verification environment: {{testedOn}} · Lab version: {{version}}</p>
+</section>
+<section aria-labelledby="feedback">
+<h2 id="feedback">Research feedback</h2>
+<p>Did the comparison make the data-to-instruction boundary clear? Share suggestions, or report a reproducibility issue with your Python version, command, expected result, and observed result.</p>
+<p><a href="{{issue}}">Report a lab reproduction</a> · <a href="https://github.com/MANU-de/Fraimedby_ms/discussions">Discuss the research</a></p>
+</section>
+</main>
+</body>
+</html>

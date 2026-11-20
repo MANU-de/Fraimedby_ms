@@ -69,13 +69,31 @@ class SiteTests(unittest.TestCase):
     def test_ready_and_planned_content(self):
         home = (DIST / "index.html").read_text(encoding="utf-8")
         self.assertEqual(home.count('data-topics='), 7)
-        self.assertEqual(home.count('>Planned</p>'), 6)
+        self.assertEqual(home.count('data-status="Planned"'), 5)
         self.assertNotIn("npx frameby", home)
         lab = (DIST / "labs/authority-boundaries/index.html").read_text(encoding="utf-8")
         self.assertEqual(lab.count("<details>"), 3)
         self.assertIn("Report a reproduction", lab)
         self.assertIn("CI evidence", lab)
         self.assertIn("Reading, downloading, and running the lab are free.", (DIST / "support/index.html").read_text(encoding="utf-8"))
+
+    def test_indirect_injection_experiment(self):
+        page = (DIST / "labs/indirect-injection/index.html").read_text(encoding="utf-8")
+        self.assertIn("Offline Simulation", page)
+        self.assertIn("framedby_injection_lab", page)
+        self.assertIn("Experimental", page)
+        home = (DIST / "index.html").read_text(encoding="utf-8")
+        self.assertIn('data-status="Experimental"', home)
+        self.assertEqual(home.count('data-topics='), 7)
+        downloaded = DIST / "downloads/indirect-injection-0.1.0.zip"
+        digest = downloaded.with_suffix(".zip.sha256").read_text().split()[0]
+        self.assertEqual(hashlib.sha256(downloaded.read_bytes()).hexdigest(), digest)
+        with ZipFile(downloaded) as archive:
+            self.assertIsNone(archive.testzip())
+            self.assertIn("framedby_injection_lab/__main__.py", archive.namelist())
+        report = json.loads((DIST / "downloads/indirect-injection-evidence.json").read_text())
+        self.assertTrue(report["all_passed"])
+        self.assertEqual(report["type"], "deterministic-simulation")
 
     def test_bundle_and_evidence(self):
         downloads = DIST / "downloads"

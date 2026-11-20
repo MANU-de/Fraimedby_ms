@@ -18,3 +18,9 @@ jobs:
           cd lab
           python -m pip install ./framework/python
           python -m framedby_lab verify examples/authority-boundaries
+      - name: Run offline indirect-injection experiment
+        run: |
+          unzip -q dist/downloads/indirect-injection-0.1.0.zip -d injection-lab
+          cd injection-lab
+          python -m unittest discover -s tests -v
+          python -m framedby_injection_lab verify examples/indirect-injection

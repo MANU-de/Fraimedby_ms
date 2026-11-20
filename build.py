@@ -46,22 +46,24 @@ def https(value):
 
 
 
-def card(lab):
+def card(lab, number):
     status = text(lab["status"])
     topics = text("|".join(lab["topics"]))
-    labels = text(" · ".join(lab["topics"]))
-    link = (
-        f'<a class="text-brand-500 font-bold" '
-        f'href="labs/{text(lab["slug"])}/">'
-        'Run locally →</a>'
-        if lab.get("bundle") else ""
-    )
-    version = f' · v{text(lab["version"])}' if lab.get("version") else ""
-    return f"""<article data-topics="{topics}" class="glass-panel rounded-2xl p-6 border border-zinc-800">
-<p class="text-brand-500 font-mono text-xs">{status}{version}</p>
-<h3 class="text-white font-bold text-lg mt-2">{text(lab["title"])}</h3>
-<p class="text-zinc-400 my-2">{text(lab["summary"])}</p>
-<p class="text-zinc-400 text-xs mb-4">{labels}</p>{link}</article>"""
+    title = text(lab["title"])
+    summary = text(lab["summary"])
+    tags = "".join(f"<span>{text(topic)}</span>" for topic in lab["topics"])
+    available = bool(lab.get("bundle"))
+    when = f'Approx. {int(lab["minutes"])} min' if lab.get("minutes") else "Research roadmap"
+    footer = (f'<a class="framedby-lab-cta" href="labs/{text(lab["slug"])}/">Inspect Lab &rarr;</a>'
+              if available else '<span class="framedby-lab-planned">In planning</span>')
+    return f"""<article data-topics="{topics}" class="framedby-lab-card">
+<div class="framedby-lab-top"><span class="framedby-lab-number">LAB #{number:02d}</span>
+<span class="framedby-lab-status" data-status="{status}">{status}</span></div>
+<h3 class="framedby-lab-title">{title}</h3>
+<p class="framedby-lab-summary">{summary}</p>
+<div class="framedby-lab-tags">{tags}</div>
+<div class="framedby-lab-bottom"><span class="framedby-lab-runtime">{text(when)}</span>{footer}</div>
+</article>"""
 
 
 def build():
@@ -89,7 +91,7 @@ def build():
     write("", render((SOURCE / "home.html").read_text(encoding="utf-8"), {
         "featured_title": text(featured["title"]), "featured_command": text(featured["command"]),
         "featured_url": f'labs/{text(featured["slug"])}/', "repository_link": text(repository_link),
-        "filters": filters, "cards": "".join(card(lab) for lab in labs),
+        "filters": filters, "cards": "".join(card(lab, i) for i, lab in enumerate(labs, 1)),
     }))
     for lab in labs:
         if not lab.get("bundle"):
@@ -99,6 +101,23 @@ def build():
         expected = bundle.with_suffix(".zip.sha256").read_text(encoding="ascii").split()[0]
         if hashlib.sha256(bundle.read_bytes()).hexdigest() != expected:
             raise ValueError(f"Checksum mismatch: {bundle.name}")
+        if slug == "indirect-injection":
+            evidence = read_json(CONTENT / "downloads" / f"{slug}-evidence.json")
+            if (evidence.get("lab_id") != "flf-002" or evidence.get("lab_version") != lab["version"]
+                    or evidence.get("all_passed") is not True
+                    or not all(evidence.get("assertions", {}).values())):
+                raise ValueError("Indirect injection evidence does not match its experimental release")
+            issue_body = f"Lab: {slug}\nVersion: {lab['version']}\nPlatform:\nCommand:\nExpected:\nObserved:\n"
+            issue = "../../contribute/" if not repo else f"https://github.com/{repo}/issues/new?" + urlencode({
+                "title": f"Reproduction: {slug} {lab['version']}", "body": issue_body,
+            })
+            excerpt = {"type": evidence["type"], "all_passed": evidence["all_passed"],
+                       "assertions": evidence["assertions"]}
+            write(f"labs/{slug}", render((SOURCE / "injection-detail.html").read_text(encoding="utf-8"), {
+                **{key: text(value) for key, value in lab.items()},
+                "issue": text(issue), "evidence": text(json.dumps(excerpt, indent=2)),
+            }))
+            continue
         evidence = read_json(CONTENT / "downloads" / f"{slug}-evidence.json")
         if any(row["lab_version"] != lab["version"] or row["status"] != "passed" for row in evidence):
             raise ValueError("Evidence must match the verified lab version")

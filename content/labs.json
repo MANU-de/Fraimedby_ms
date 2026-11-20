@@ -35,10 +35,33 @@
     "slug": "indirect-injection",
     "title": "Bypassing Guardrails via Indirect Multi-Turn Injection",
     "topics": [
-      "Prompt Injection"
+      "Prompt Injection",
+      "Red Teaming"
     ],
-    "status": "Planned",
-    "summary": "Research concept in the roadmap."
+    "status": "Experimental",
+    "summary": "A deterministic, offline study of nested Markdown in successive RAG retrieval turns: compare an intentionally vulnerable instruction interpreter against a strict source-as-data boundary.",
+    "version": "0.1.0",
+    "minutes": 10,
+    "verifiedOn": "2026-11-19",
+    "testedOn": "Python 3.13.5 / offline simulation (Docker not tested)",
+    "prerequisites": "Python 3.11+ and a terminal. No dependencies or API keys required. Dockerfile optional.",
+    "bundle": "indirect-injection-0.1.0.zip",
+    "command": "python -m framedby_injection_lab verify examples/indirect-injection",
+    "verificationRun": "",
+    "cases": [
+      [
+        "Turn 1–2: Is an instruction promoted?",
+        "No. Ordinary retrieved documents lead to a normal response."
+      ],
+      [
+        "Turn 3: What happens with the intentionally vulnerable interpreter?",
+        "It emits a fixed synthetic canary after promoting source text to instruction authority."
+      ],
+      [
+        "Turn 3: What happens with the guarded interpreter?",
+        "The marker remains data; the benign retention question is answered."
+      ]
+    ]
   },
   {
     "slug": "safetensors-backdoors",
